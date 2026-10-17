@@ -2,6 +2,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { HttpHeaders } from '@angular/common/http';
 export interface LoginData {
   username: string;
   password: string;
@@ -17,7 +18,10 @@ export interface LoginResponse {
     role: 'ADMIN' | 'CHEF' | 'ASSOCIATION' | 'CONSUMER';
   };
 }
-
+export interface LoginResponse {
+  access: string;
+  refresh: string;
+}
 export interface RegisterData {
   username: string;
   email: string;
@@ -41,12 +45,25 @@ export class AuthService {
       data
     );
   }
-
-login(data: LoginData): Observable<any> {
-  return this.http.post(
+login(credentials: {
+  username: string;
+  password: string;
+}) {
+  return this.http.post<LoginResponse>(
     `${this.apiUrl}/auth/login/`,
-    data
+    credentials
   );
 }
+getProfile() {
+  const token = localStorage.getItem('access_token');
 
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`
+  });
+
+  return this.http.get<any>(
+    `${this.apiUrl}/users/me/`,
+    { headers }
+  );
+}
 }

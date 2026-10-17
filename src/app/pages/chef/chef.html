@@ -1,1 +1,416 @@
-<p>chef works!</p>
+
+<div class="chef-page">
+  <aside class="sidebar">
+    <a class="brand" href="#" aria-label="SmartFood accueil">
+      <span class="brand-icon">
+        <svg lucideLeaf [size]="25"></svg>
+      </span>
+      <span class="brand-copy">
+        <strong>smartfood<span>.</span></strong>
+        <small>ESPACE RESTAURATEUR</small>
+      </span>
+    </a>
+
+    <div class="restaurant-profile">
+      <div class="avatar">
+        <svg lucideClipboardList [size]="21"></svg>
+      </div>
+      <div class="profile-copy">
+        <strong>Mon restaurant</strong>
+        <span>Gestion alimentaire</span>
+      </div>
+      <span class="profile-indicator"></span>
+    </div>
+
+    <p class="menu-label">ESPACE DE TRAVAIL</p>
+
+    <nav class="navigation">
+      <button [class.active]="onglet === 'dashboard'"
+        (click)="changerOnglet('dashboard')">
+        <svg lucideLayoutDashboard [size]="19"></svg>
+        <span>Vue d'ensemble</span>
+      </button>
+
+      <button [class.active]="onglet === 'stock'"
+        (click)="changerOnglet('stock')">
+        <svg lucidePackage [size]="19"></svg>
+        <span>Mon inventaire</span>
+      </button>
+
+      <button [class.active]="onglet === 'alertes'"
+        (click)="changerOnglet('alertes')">
+        <svg lucideBell [size]="19"></svg>
+        <span>Alertes alimentaires</span>
+        <span class="nav-count"
+          *ngIf="nombreUrgent + nombreSurveillance > 0">
+          {{ nombreUrgent + nombreSurveillance }}
+        </span>
+      </button>
+
+      <button [class.active]="onglet === 'partage'"
+        (click)="changerOnglet('partage')">
+        <svg lucideHeartHandshake [size]="19"></svg>
+        <span>Solidarité alimentaire</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="impact-card">
+        <div class="impact-top">
+          <svg lucideLeaf [size]="20"></svg>
+          <span>NOTRE ENGAGEMENT</span>
+        </div>
+        <h3>Chaque surplus peut aider quelqu'un.</h3>
+        <p>
+          Identifiez les produits à valoriser et facilitez leur partage
+          avec les associations locales.
+        </p>
+        <button (click)="changerOnglet('partage')">
+          Valoriser mes surplus
+          <svg lucideArrowRight [size]="16"></svg>
+        </button>
+      </div>
+      <div class="sidebar-footer">
+        <span class="footer-dot"></span>
+        SmartFood · Hammamet
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="page-heading">
+        <p class="breadcrumb">SMARTFOOD <span>/</span> ESPACE CHEF</p>
+        <h1>
+          {{ onglet === 'dashboard' ? 'Vue d’ensemble'
+            : onglet === 'stock' ? 'Mon inventaire'
+            : onglet === 'alertes' ? 'Alertes alimentaires'
+            : 'Solidarité alimentaire' }}
+        </h1>
+      </div>
+
+      <div class="topbar-actions">
+        <span class="location-tag">
+          <svg lucideLeaf [size]="15"></svg>
+          Hammamet, Tunisie
+        </span>
+        <button class="notification-button"
+          (click)="changerOnglet('alertes')"
+          aria-label="Consulter les alertes">
+          <svg lucideBell [size]="19"></svg>
+          <span class="notification-dot" *ngIf="nombreUrgent > 0"></span>
+        </button>
+        <div class="user-avatar">C</div>
+      </div>
+    </header>
+
+    <div class="feedback" *ngIf="message">
+      <svg lucideLeaf [size]="18"></svg>
+      <span>{{ message }}</span>
+      <button (click)="message = ''" aria-label="Fermer">
+        <svg lucideX [size]="17"></svg>
+      </button>
+    </div>
+
+    <!-- TABLEAU DE BORD -->
+    <section *ngIf="onglet === 'dashboard'">
+      <div class="welcome-banner">
+        <div class="welcome-copy">
+          <span class="eyebrow">
+            <span class="eyebrow-line"></span>
+            AGIR LOCALEMENT, IMPACTER DURABLEMENT
+          </span>
+          <h2>La bonne gestion<br />commence <em>ici.</em></h2>
+          <p>
+            Suivez vos stocks, anticipez les dates limites et donnez
+            une seconde vie aux surplus encore consommables.
+          </p>
+          <button class="primary-button" (click)="ouvrirFormulaire()">
+            <svg lucidePlus [size]="18"></svg>
+            Ajouter au stock
+          </button>
+        </div>
+
+        <div class="banner-art" aria-hidden="true">
+          <div class="art-circle art-circle-one"></div>
+          <div class="art-circle art-circle-two"></div>
+          <div class="art-center">
+            <svg lucideLeaf [size]="66"></svg>
+          </div>
+          <span class="art-caption">CONSERVER · PARTAGER · VALORISER</span>
+        </div>
+        <div class="banner-index">01 <span>/ 04</span></div>
+      </div>
+
+      <div class="section-overline">
+        <span>INDICATEURS DU RESTAURANT</span>
+        <span class="section-rule"></span>
+        <span class="live-label"><span></span> STOCK ACTUEL</span>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card stat-stock">
+          <div class="stat-card-top">
+            <span class="stat-icon">
+              <svg lucidePackage [size]="20"></svg>
+            </span>
+            <span class="stat-number">01</span>
+          </div>
+          <p>Produits en stock</p>
+          <h3>{{ produits.length }}</h3>
+          <span class="stat-foot">Références enregistrées</span>
+        </article>
+
+        <article class="stat-card stat-watch">
+          <div class="stat-card-top">
+            <span class="stat-icon">
+              <svg lucideCalendarDays [size]="20"></svg>
+            </span>
+            <span class="stat-number">02</span>
+          </div>
+          <p>À surveiller</p>
+          <h3>{{ nombreSurveillance }}</h3>
+          <span class="stat-foot">Contrôle recommandé</span>
+        </article>
+
+        <article class="stat-card stat-urgent">
+          <div class="stat-card-top">
+            <span class="stat-icon">
+              <svg lucideAlertTriangle [size]="20"></svg>
+            </span>
+            <span class="stat-number">03</span>
+          </div>
+          <p>Actions urgentes</p>
+          <h3>{{ nombreUrgent }}</h3>
+          <span class="stat-foot">Vérification prioritaire</span>
+        </article>
+
+        <article class="stat-card stat-donation">
+          <div class="stat-card-top">
+            <span class="stat-icon">
+              <svg lucideHeartHandshake [size]="20"></svg>
+            </span>
+            <span class="stat-number">04</span>
+          </div>
+          <p>Quantité proposée au don</p>
+          <h3>{{ quantiteProposee }}</h3>
+          <span class="stat-foot">Unités cumulées · propositions non finalisées</span>
+        </article>
+      </div>
+
+      <div class="dashboard-grid">
+        <article class="panel stock-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">INVENTAIRE</span>
+              <h3>État du stock</h3>
+              <p>Les quatre premières références enregistrées.</p>
+            </div>
+            <button class="text-button" (click)="changerOnglet('stock')">
+              Tout afficher
+              <svg lucideArrowRight [size]="16"></svg>
+            </button>
+          </div>
+
+          <div class="product-list">
+            <div class="product-row" *ngFor="let p of produits.slice(0, 4)">
+              <div class="product-mark">
+                <svg lucidePackage [size]="20"></svg>
+              </div>
+              <div class="product-info">
+                <strong>{{ p.nom }}</strong>
+                <span>{{ p.quantite }} {{ p.unite }} disponibles</span>
+              </div>
+              <span class="status" [ngClass]="getStatutClass(p.statut)">
+                {{ p.statut }}
+              </span>
+            </div>
+            <div class="empty-state" *ngIf="produits.length === 0">
+              <svg lucidePackage [size]="28"></svg>
+              <strong>Votre inventaire est vide</strong>
+              <span>Ajoutez votre premier produit pour commencer.</span>
+              <button class="text-button" (click)="ouvrirFormulaire()">
+                Ajouter un produit
+                <svg lucideArrowRight [size]="16"></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel ai-panel">
+          <div class="ai-heading">
+            <span class="ai-icon">
+              <svg lucideSparkles [size]="21"></svg>
+            </span>
+            <div>
+              <span class="panel-kicker">AIDE À LA DÉCISION</span>
+              <h3>Assistant SmartFood</h3>
+            </div>
+          </div>
+
+          <div class="ai-body">
+            <span class="ai-label">RECOMMANDATION</span>
+            <p>{{ suggestionIA }}</p>
+          </div>
+
+          <button class="ai-button" (click)="changerOnglet('alertes')">
+            Examiner les produits à risque
+            <svg lucideArrowRight [size]="17"></svg>
+          </button>
+          <p class="demo-note">
+            Les recommandations affichées sont simulées dans cette version
+            de démonstration.
+          </p>
+        </article>
+      </div>
+
+      <article class="panel actions-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="panel-kicker">PASSER À L’ACTION</span>
+            <h3>Que souhaitez-vous faire ?</h3>
+            <p>Choisissez comment gérer ou valoriser vos surplus.</p>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button class="quick-action" (click)="ouvrirFormulaire()">
+            <span class="quick-icon quick-green">
+              <svg lucidePlus [size]="21"></svg>
+            </span>
+            <span class="quick-copy">
+              <strong>Ajouter un produit</strong>
+              <small>Mettre à jour les quantités disponibles</small>
+            </span>
+            <svg class="quick-arrow" lucideArrowRight [size]="18"></svg>
+          </button>
+
+          <button class="quick-action" (click)="changerOnglet('partage')">
+            <span class="quick-icon quick-coral">
+              <svg lucideHeartHandshake [size]="21"></svg>
+            </span>
+            <span class="quick-copy">
+              <strong>Proposer un don</strong>
+              <small>Orienter les surplus vers une association</small>
+            </span>
+            <svg class="quick-arrow" lucideArrowRight [size]="18"></svg>
+          </button>
+
+          <button class="quick-action" (click)="changerOnglet('partage')">
+            <span class="quick-icon quick-lime">
+              <svg lucidePercent [size]="21"></svg>
+            </span>
+            <span class="quick-copy">
+              <strong>Créer une promotion</strong>
+              <small>Proposer un prix réduit avant la date limite</small>
+            </span>
+            <svg class="quick-arrow" lucideArrowRight [size]="18"></svg>
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <!-- GESTION DU STOCK -->
+    <section *ngIf="onglet === 'stock'">
+      <div class="section-intro">
+        <div>
+          <span class="panel-kicker">GESTION DES PRODUITS</span>
+          <h2>Mon inventaire</h2>
+          <p>Suivez les quantités et les dates limites de vos produits.</p>
+        </div>
+        <button class="primary-button" (click)="ouvrirFormulaire()">
+          <svg lucidePlus [size]="18"></svg>
+          Ajouter un produit
+        </button>
+      </div>
+
+      <article class="panel form-panel" *ngIf="afficherFormulaire">
+        <div class="panel-heading">
+          <div>
+            <span class="panel-kicker">NOUVELLE ENTRÉE</span>
+            <h3>Ajouter au stock</h3>
+            <p>Renseignez les informations du produit.</p>
+          </div>
+          <button class="close-button" (click)="annulerFormulaire()"
+            aria-label="Fermer le formulaire">
+            <svg lucideX [size]="19"></svg>
+          </button>
+        </div>
+
+        <form (ngSubmit)="ajouterProduit()" class="product-form">
+          <label>
+            Nom du produit *
+            <input type="text" name="nom" [(ngModel)]="nouveauProduit.nom"
+              placeholder="Ex. : tomates fraîches" required />
+          </label>
+
+          <label>
+            Catégorie
+            <select name="categorie" [(ngModel)]="nouveauProduit.categorie">
+              <option value="Fruits">Fruits</option>
+              <option value="Légumes">Légumes</option>
+              <option value="Viandes">Viandes</option>
+              <option value="Produits laitiers">Produits laitiers</option>
+              <option value="Autres">Autres</option>
+            </select>
+          </label>
+
+          <label>
+            Quantité *
+            <input type="number" name="quantite"
+              [(ngModel)]="nouveauProduit.quantite"
+              min="0.01" step="0.01" required />
+          </label>
+
+          <label>
+            Unité
+            <select name="unite" [(ngModel)]="nouveauProduit.unite">
+              <option value="kg">Kilogramme (kg)</option>
+              <option value="L">Litre (L)</option>
+              <option value="unité">Unité</option>
+            </select>
+          </label>
+
+          <label>
+            Date d'achat *
+            <input type="date" name="dateAchat"
+              [(ngModel)]="nouveauProduit.dateAchat" required />
+          </label>
+
+          <label>
+            Date limite *
+            <input type="date" name="dateLimite"
+              [(ngModel)]="nouveauProduit.dateLimite" required />
+          </label>
+
+          <label>
+            Consommation journalière estimée
+            <input type="number" name="consommationJournaliere"
+              [(ngModel)]="nouveauProduit.consommationJournaliere"
+              min="0" step="0.1" />
+          </label>
+
+          <label>
+            Prix unitaire (DT)
+            <input type="number" name="prix"
+              [(ngModel)]="nouveauProduit.prix"
+              min="0" step="0.01" />
+          </label>
+
+          <div class="form-actions">
+            <button class="primary-button" type="submit">
+              <svg lucidePlus [size]="17"></svg>
+              Enregistrer le produit
+            </button>
+            <button class="secondary-button" type="button"
+              (click)="annulerFormulaire()">
+              Annuler
+            </button>
+          </div>
+        </form>
+      </article>
+    </section>
+
+    <!-- Conserve ici les sections existantes pour alertes et partage. -->
+  </main>
+</div>

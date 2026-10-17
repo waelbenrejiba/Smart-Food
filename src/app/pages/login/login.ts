@@ -1,4 +1,3 @@
-
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -37,21 +36,52 @@ export class LoginComponent {
       username: this.username.trim(),
       password: this.password
     }).subscribe({
-      
-next: (response) => {
-  this.loading = false;
+      next: (response) => {
+        // Sauvegarder les tokens reçus de Django
+        localStorage.setItem('access_token', response.access);
+        localStorage.setItem('refresh_token', response.refresh);
 
-  localStorage.setItem('access_token', response.access);
-  localStorage.setItem('refresh_token', response.refresh);
+        // Récupérer les informations du compte depuis Django
+        this.authService.getProfile().subscribe({
+          next: (user) => {
+            this.loading = false;
 
-  this.success = true;
-  this.message = 'Connexion réussie !';
+            switch (user.role) {
+              case 'CHEF':
+                this.router.navigate(['/chef']);
+                break;
 
-  setTimeout(() => {
-    this.router.navigate(['/']);
-  }, 800);
-},
+              case 'ASSOCIATION':
+                this.router.navigate(['/association']);
+                break;
 
+              case 'CONSUMER':
+                this.router.navigate(['/consommateur']);
+                break;
+
+              case 'ADMIN':
+                this.router.navigate(['/admin']);
+                break;
+
+              default:
+                this.message =
+                  'Rôle du compte absent ou non reconnu.';
+                break;
+            }
+          },
+
+          error: (error) => {
+            this.loading = false;
+            this.message =
+              'Impossible de récupérer le profil utilisateur.';
+
+            console.error(
+              'Erreur de récupération du profil :',
+              error
+            );
+          }
+        });
+      },
 
       error: (error) => {
         this.loading = false;
@@ -59,7 +89,10 @@ next: (response) => {
         if (error.status === 0) {
           this.message =
             'Django est inaccessible. Vérifiez le serveur et CORS.';
-        } else if (error.status === 400 || error.status === 401) {
+        } else if (
+          error.status === 400 ||
+          error.status === 401
+        ) {
           this.message =
             'Nom d’utilisateur ou mot de passe incorrect.';
         } else {
