@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Poisson frais",
+    "quantity": 3,
+    "unit": "kg",
+    "days_to_expiry": 1,
+    "location": "Réfrigérateur",
+    "temperature_c": 2,
+    "reorder_below": 1
+  },
+  {
+    "name": "Tomates",
+    "quantity": 6,
+    "unit": "kg",
+    "days_to_expiry": 2,
+    "location": "Réfrigérateur",
+    "temperature_c": 4,
+    "reorder_below": 2
+  },
+  {
+    "name": "Poulet",
+    "quantity": 5,
+    "unit": "kg",
+    "days_to_expiry": 4,
+    "location": "Réfrigérateur",
+    "temperature_c": 3,
+    "reorder_below": 2
+  },
+  {
+    "name": "Fraises",
+    "quantity": 2,
+    "unit": "kg",
+    "days_to_expiry": 3,
+    "location": "Réfrigérateur",
+    "temperature_c": 4,
+    "reorder_below": 1
+  },
+  {
+    "name": "Pommes de terre",
+    "quantity": 18,
+    "unit": "kg",
+    "days_to_expiry": 28,
+    "location": "Réserve sèche",
+    "temperature_c": null,
+    "reorder_below": 5
+  },
+  {
+    "name": "Lait",
+    "quantity": 8,
+    "unit": "L",
+    "days_to_expiry": 7,
+    "location": "Réfrigérateur",
+    "temperature_c": 3,
+    "reorder_below": 3
+  },
+  {
+    "name": "Salade verte",
+    "quantity": 1,
+    "unit": "kg",
+    "days_to_expiry": 0,
+    "location": "Réfrigérateur",
+    "temperature_c": 4,
+    "reorder_below": 1
+  },
+  {
+    "name": "Riz",
+    "quantity": 12,
+    "unit": "kg",
+    "days_to_expiry": 180,
+    "location": "Réserve sèche",
+    "temperature_c": null,
+    "reorder_below": 4
+  }
+]
