@@ -1,0 +1,440 @@
+ 
+
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <a class="logo" (click)="changerPage('dashboard')">
+      Smart<span>Food</span>
+    </a>
+
+    <p class="menu-title">MENU PRINCIPAL</p>
+
+    <button class="menu-link"
+      [class.active]="page === 'dashboard'"
+      (click)="changerPage('dashboard')">
+      Tableau de bord
+    </button>
+
+    <button class="menu-link"
+      [class.active]="page === 'produits'"
+      (click)="changerPage('produits')">
+      Mes produits
+    </button>
+
+    <button class="menu-link"
+      [class.active]="page === 'ajout'"
+      (click)="changerPage('ajout')">
+      Ajouter un produit
+    </button>
+
+    <button class="menu-link"
+      [class.active]="page === 'associations'"
+      (click)="changerPage('associations')">
+      Associations
+    </button>
+
+    <button class="menu-link"
+      [class.active]="page === 'demandes'"
+      (click)="changerPage('demandes')">
+      Mes demandes
+    </button>
+
+    <div class="sidebar-bottom">
+      <div class="avatar">C</div>
+      <div>
+        <strong>Espace Chef</strong>
+        <small>Restaurant</small>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="topbar">
+      <div>
+        <h1>
+          <span *ngIf="page === 'dashboard'">Tableau de bord</span>
+          <span *ngIf="page === 'produits'">Mes produits</span>
+          <span *ngIf="page === 'ajout'">Ajouter un produit</span>
+          <span *ngIf="page === 'associations'">Associations</span>
+          <span *ngIf="page === 'demandes'">Mes demandes</span>
+        </h1>
+        <p>Gérez vos produits et réduisez le gaspillage alimentaire.</p>
+      </div>
+
+      <div class="profile">
+        <div class="profile-avatar">C</div>
+        <div>
+          <strong>Chef Restaurant</strong>
+          <small>Gestionnaire</small>
+        </div>
+      </div>
+    </header>
+
+    <div class="message" *ngIf="message">
+      {{ message }}
+      <button type="button" (click)="message = ''">×</button>
+    </div>
+
+    <!-- TABLEAU DE BORD -->
+    <section *ngIf="page === 'dashboard'">
+
+      <div class="stats">
+        <article class="stat-card">
+          <div class="stat-icon">01</div>
+          <p>Produits disponibles</p>
+          <h2>{{ produits.length }}</h2>
+          <small>Produits enregistrés</small>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon">02</div>
+          <p>Expiration aujourd'hui</p>
+          <h2>{{ produitsUrgents.length }}</h2>
+          <small>À vérifier rapidement</small>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon">03</div>
+          <p>Demandes en attente</p>
+          <h2>{{ demandesEnAttente }}</h2>
+          <small>En attente de réponse</small>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon">04</div>
+          <p>Demandes acceptées</p>
+          <h2>{{ demandesAcceptees }}</h2>
+          <small>Acceptées par une association</small>
+        </article>
+      </div>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <h2>Produits à traiter en priorité</h2>
+            <p>Produits dont la péremption est aujourd'hui ou dépassée.</p>
+          </div>
+
+          <button class="btn-secondary"
+            (click)="changerPage('produits')">
+            Voir tout
+          </button>
+        </div>
+
+        <div class="empty-state" *ngIf="produitsUrgents.length === 0">
+          Aucun produit urgent pour le moment.
+        </div>
+
+        <div class="product-row" *ngFor="let p of produitsUrgents">
+          <div class="product-icon">P</div>
+
+          <div class="product-info">
+            <strong>{{ p.nom }}</strong>
+            <small>{{ p.quantite }} {{ p.unite }} · {{ p.categorie }}</small>
+          </div>
+
+          <div class="product-deadline">
+            <strong>{{ p.peremption }}</strong>
+            <small>Avant {{ p.heureLimite }}</small>
+          </div>
+
+          <span class="status urgent">Prioritaire</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <h2>Actions rapides</h2>
+            <p>Accédez aux fonctions principales.</p>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button class="btn-primary"
+            (click)="changerPage('ajout')">
+            + Ajouter un produit
+          </button>
+
+          <button class="btn-secondary"
+            (click)="changerPage('associations')">
+            Voir les associations
+          </button>
+
+          <button class="btn-secondary"
+            (click)="changerPage('demandes')">
+            Suivre les demandes
+          </button>
+        </div>
+      </section>
+    </section>
+
+    <!-- AJOUTER UN PRODUIT -->
+    <section class="panel" *ngIf="page === 'ajout'">
+      <div class="section-heading">
+        <div>
+          <h2>Informations du produit</h2>
+          <p>Remplissez les informations avant de publier.</p>
+        </div>
+      </div>
+
+      <form (ngSubmit)="ajouterProduit()">
+        <div class="form-grid">
+
+          <label>
+            Nom du produit *
+            <input name="nom"
+              [(ngModel)]="produitForm.nom"
+              type="text"
+              placeholder="Ex : Pain frais"
+              required>
+          </label>
+
+          <label>
+            Catégorie *
+            <select name="categorie"
+              [(ngModel)]="produitForm.categorie"
+              required>
+              <option value="">Choisir une catégorie</option>
+              <option *ngFor="let c of categories" [value]="c">
+                {{ c }}
+              </option>
+            </select>
+          </label>
+
+          <label>
+            Quantité *
+            <input name="quantite"
+              [(ngModel)]="produitForm.quantite"
+              type="number"
+              min="1"
+              required>
+          </label>
+
+          <label>
+            Unité
+            <select name="unite" [(ngModel)]="produitForm.unite">
+              <option>Pièces</option>
+              <option>Kg</option>
+              <option>Litres</option>
+              <option>Portions</option>
+            </select>
+          </label>
+
+          <label>
+            Date de péremption *
+            <input name="peremption"
+              [(ngModel)]="produitForm.peremption"
+              type="date"
+              required>
+          </label>
+
+          <label>
+            Heure limite de récupération *
+            <input name="heureLimite"
+              [(ngModel)]="produitForm.heureLimite"
+              type="time"
+              required>
+          </label>
+
+          <label>
+            Prix normal (DT)
+            <input name="prixNormal"
+              [(ngModel)]="produitForm.prixNormal"
+              type="number"
+              min="0"
+              step="0.001"
+              required>
+          </label>
+
+          <label>
+            Prix proposé (DT)
+            <input name="prixPropose"
+              [(ngModel)]="produitForm.prixPropose"
+              type="number"
+              min="0"
+              step="0.001"
+              required>
+          </label>
+
+        </div>
+
+        <label class="description-field">
+          Description
+          <textarea name="description"
+            [(ngModel)]="produitForm.description"
+            rows="4"
+            placeholder="État du produit et conditions de récupération...">
+          </textarea>
+        </label>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary"
+            (click)="changerPage('dashboard')">
+            Annuler
+          </button>
+
+          <button type="submit" class="btn-primary">
+            Publier le produit
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- MES PRODUITS -->
+    <section class="panel" *ngIf="page === 'produits'">
+      <div class="section-heading">
+        <div>
+          <h2>Liste des produits</h2>
+          <p>Recherchez, filtrez ou supprimez vos produits.</p>
+        </div>
+
+        <button class="btn-primary" (click)="changerPage('ajout')">
+          + Ajouter
+        </button>
+      </div>
+
+      <div class="filters">
+        <input type="search"
+          placeholder="Rechercher un produit..."
+          [(ngModel)]="recherche"
+          name="recherche">
+
+        <select [(ngModel)]="filtreCategorie" name="filtreCategorie">
+          <option value="Toutes">Toutes les catégories</option>
+          <option *ngFor="let c of categories" [value]="c">
+            {{ c }}
+          </option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Catégorie</th>
+              <th>Quantité</th>
+              <th>Péremption</th>
+              <th>Prix proposé</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let p of produitsFiltres">
+              <td>
+                <strong>{{ p.nom }}</strong>
+                <small class="table-description">
+                  {{ p.description || 'Aucune description' }}
+                </small>
+              </td>
+              <td>{{ p.categorie }}</td>
+              <td>{{ p.quantite }} {{ p.unite }}</td>
+              <td>{{ p.peremption }}</td>
+              <td>{{ p.prixPropose | number:'1.3-3' }} DT</td>
+              <td>
+                <button class="btn-delete"
+                  type="button"
+                  (click)="supprimerProduit(p.id)">
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="produitsFiltres.length === 0">
+              <td colspan="6" class="empty-state">
+                Aucun produit trouvé.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ASSOCIATIONS -->
+    <section class="panel" *ngIf="page === 'associations'">
+      <div class="section-heading">
+        <div>
+          <h2>Associations partenaires</h2>
+          <p>Contactez les associations pour organiser la récupération.</p>
+        </div>
+      </div>
+
+      <div class="association-row" *ngFor="let a of associations">
+        <div class="association-avatar">A</div>
+
+        <div class="association-info">
+          <strong>{{ a.nom }}</strong>
+          <small>{{ a.description }}</small>
+          <small *ngIf="a.telephone">Tél : {{ a.telephone }}</small>
+        </div>
+
+        <button class="btn-primary"
+          type="button"
+          (click)="contacterAssociation(a.nom, a.telephone)">
+          Contacter
+        </button>
+      </div>
+
+      <p class="hint">
+        Les coordonnées doivent être renseignées pour pouvoir appeler une association.
+      </p>
+    </section>
+
+    <!-- MES DEMANDES -->
+    <section class="panel" *ngIf="page === 'demandes'">
+      <div class="section-heading">
+        <div>
+          <h2>Suivi des demandes</h2>
+          <p>Consultez et mettez à jour le statut des demandes.</p>
+        </div>
+      </div>
+
+      <div class="request-row" *ngFor="let d of demandes">
+        <div class="request-info">
+          <strong>{{ d.produit }} · {{ d.quantite }}</strong>
+          <small>{{ d.association }}</small>
+        </div>
+
+        <span class="status"
+          [class.pending]="d.statut === 'En attente'"
+          [class.confirmed]="d.statut === 'Acceptée'"
+          [class.refused]="d.statut === 'Refusée'"
+          [class.recovered]="d.statut === 'Récupérée'">
+          {{ d.statut }}
+        </span>
+
+        <div class="request-actions">
+          <button type="button"
+            class="btn-secondary"
+            (click)="changerStatut(d, 'Acceptée')">
+            Accepter
+          </button>
+
+          <button type="button"
+            class="btn-secondary"
+            (click)="changerStatut(d, 'Refusée')">
+            Refuser
+          </button>
+
+          <button type="button"
+            class="btn-primary"
+            (click)="changerStatut(d, 'Récupérée')">
+            Récupéré
+          </button>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="demandes.length === 0">
+        Aucune demande pour le moment.
+      </div>
+    </section>
+
+    <footer>
+      SmartFood · Réduisons ensemble le gaspillage alimentaire.
+    </footer>
+
+  </main>
+</div>
