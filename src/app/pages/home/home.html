@@ -1,0 +1,87 @@
+<div class="home-container">
+  
+  <!-- Barre de navigation -->
+  <header class="navbar fade-in-down">
+    <div class="logo">
+      <span class="material-symbols-rounded logo-icon">restaurant</span>
+      SmartFood <span>Hammamet</span>
+    </div>
+    <nav>
+      <!-- Bouton de connexion avec effet 3D -->
+      <button class="btn-login" (click)="goToLogin()">Se Connecter</button>
+    </nav>
+  </header>
+
+  <!-- Section principale (Hero) -->
+  <main class="hero">
+    <div class="hero-content slide-in-left">
+      <div class="badge">Sauvons la planète 🌍</div>
+      <h1>L'anti-gaspillage <br>devient <span class="highlight">Intelligent</span></h1>
+      <p>
+        Préservez la beauté de Hammamet. Récupérez les délicieux invendus de vos restaurants et boulangeries préférés à des prix imbattables. Une solution élégante pour votre portefeuille et pour l'environnement.
+      </p>
+      
+      <div class="action-buttons">
+        <button class="btn-primary" routerLink="/user">
+          Explorer les paniers
+          <span class="material-symbols-rounded">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="hero-image-wrapper slide-in-right">
+      <!-- Conteneur 3D pour l'image -->
+      <div class="image-3d-container">
+        <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&q=80&w=800" 
+             alt="Repas gastronomique" 
+             class="floating-img-3d">
+        <!-- Badge flottant en 3D -->
+        <div class="floating-badge badge-1">
+          <span class="material-symbols-rounded">sell</span> -70% de réduction
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Section Explicative (Features 3D) -->
+  <section class="features fade-in-up">
+    <h2>Comment ça marche ?</h2>
+    <div class="cards-3d-wrapper">
+      
+      <!-- Carte 1 -->
+      <div class="card-3d">
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <span class="material-symbols-rounded">location_on</span>
+          </div>
+          <h3>Localisez</h3>
+          <p>Découvrez les commerçants partenaires à Hammamet (Centre, Yasmine, Barraket Sahel).</p>
+        </div>
+      </div>
+
+      <!-- Carte 2 -->
+      <div class="card-3d">
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <span class="material-symbols-rounded">shopping_bag</span>
+          </div>
+          <h3>Réservez</h3>
+          <p>Sécurisez votre panier surprise en 1 clic directement sur notre plateforme sécurisée.</p>
+        </div>
+      </div>
+
+      <!-- Carte 3 -->
+      <div class="card-3d">
+        <div class="card-content">
+          <div class="icon-wrapper">
+            <span class="material-symbols-rounded">volunteer_activism</span>
+          </div>
+          <h3>Savourez</h3>
+          <p>Récupérez votre commande, régalez-vous et faites un geste fort pour l'environnement.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
