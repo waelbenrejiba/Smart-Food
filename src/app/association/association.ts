@@ -1,8 +1,29 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { DonationOfferResponse, DonationOffersService } from '../services/donation-offers.service';
-import { LucideArrowRight, LucideBell, LucideCheck, LucideHeartHandshake, LucideLeaf, LucideLogOut, LucidePackage, LucideSearch, LucideX } from '@lucide/angular';
+import {
+  DonationOfferResponse,
+  DonationOffersService,
+} from '../services/donation-offers.service';
+
+import {
+  LucideArrowRight,
+  LucideBell,
+  LucideCheck,
+  LucideHeartHandshake,
+  LucideLeaf,
+  LucideLogOut,
+  LucidePackage,
+  LucideSearch,
+  LucideX,
+} from '@lucide/angular';
 
 type OfferStatus = 'pending' | 'accepted' | 'refused';
 type OfferFilter = 'all' | OfferStatus;
@@ -22,7 +43,18 @@ interface DonationOffer {
 
 @Component({
   selector: 'app-association',
-  imports: [LucideArrowRight, LucideBell, LucideCheck, LucideHeartHandshake, LucideLeaf, LucideLogOut, LucidePackage, LucideSearch, LucideX],
+  standalone: true,
+  imports: [
+    LucideArrowRight,
+    LucideBell,
+    LucideCheck,
+    LucideHeartHandshake,
+    LucideLeaf,
+    LucideLogOut,
+    LucidePackage,
+    LucideSearch,
+    LucideX,
+  ],
   templateUrl: './association.html',
   styleUrl: './association.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,35 +72,64 @@ export class Association {
   readonly activeFilter = signal<OfferFilter>('pending');
   readonly searchTerm = signal('');
   readonly feedback = signal('');
-  readonly pendingCount = computed(() => this.offers().filter((offer) => offer.status === 'pending').length);
-  readonly acceptedCount = computed(() => this.offers().filter((offer) => offer.status === 'accepted').length);
-  readonly urgentCount = computed(() => this.offers().filter((offer) => offer.status === 'pending' && this.daysUntil(offer.expirationDate) <= 2).length);
+
+  readonly pendingCount = computed(
+    () => this.offers().filter((offer) => offer.status === 'pending').length
+  );
+
+  readonly acceptedCount = computed(
+    () => this.offers().filter((offer) => offer.status === 'accepted').length
+  );
+
+  readonly urgentCount = computed(
+    () =>
+      this.offers().filter(
+        (offer) =>
+          offer.status === 'pending' &&
+          this.daysUntil(offer.expirationDate) >= 0 &&
+          this.daysUntil(offer.expirationDate) <= 2
+      ).length
+  );
+
   readonly filteredOffers = computed(() => {
     const filter = this.activeFilter();
     const search = this.searchTerm().trim().toLocaleLowerCase('fr');
+
     return this.offers().filter((offer) => {
-      const matchesFilter = filter === 'all' || offer.status === filter;
-      const text = `${offer.product} ${offer.category} ${offer.restaurant} ${offer.location}`;
-      return matchesFilter && text.toLocaleLowerCase('fr').includes(search);
+      const matchesFilter =
+        filter === 'all' || offer.status === filter;
+
+      const text =
+        `${offer.product} ${offer.category} ` +
+        `${offer.restaurant} ${offer.location}`;
+
+      return (
+        matchesFilter &&
+        text.toLocaleLowerCase('fr').includes(search)
+      );
     });
   });
 
   constructor() {
-    if (typeof localStorage !== 'undefined') this.loadOffers();
+    this.loadOffers();
   }
 
+  /**
+   * Charge les propositions de dons depuis l'API Django.
+   */
   loadOffers(): void {
     this.loading.set(true);
     this.loadError.set('');
+
     this.donationOffersService.list().subscribe({
-      next: (offers) => {
+      next: (offers: DonationOfferResponse[]) => {
         this.offers.set(offers.map((offer) => this.mapOffer(offer)));
         this.loading.set(false);
       },
       error: (error: { status: number }) => {
         this.loading.set(false);
         this.loadError.set(this.apiErrorMessage(error.status));
-      }
+      },
     });
   }
 
@@ -76,34 +137,76 @@ export class Association {
     this.activeFilter.set(filter);
   }
 
+  updateSearch(event: Event): void {
+    if (event.target instanceof HTMLInputElement) {
+      this.searchTerm.set(event.target.value);
+    }
+  }
+
   logout(): void {
     this.authService.logout();
     void this.router.navigate(['/login']);
   }
 
-  updateSearch(event: Event): void {
-    if (event.target instanceof HTMLInputElement) this.searchTerm.set(event.target.value);
-  }
-
-  respondToOffer(id: number, status: 'accepted' | 'refused'): void {
+  /**
+   * Accepte ou refuse une proposition.
+   * L'API Django reste responsable de la validation et des permissions.
+   */
+  respondToOffer(
+    id: number,
+    status: 'accepted' | 'refused'
+  ): void {
     const offer = this.offers().find((item) => item.id === id);
-    if (!offer || offer.status !== 'pending' || this.respondingOfferId() !== null) return;
+
+    if (
+      !offer ||
+      offer.status !== 'pending' ||
+      this.respondingOfferId() !== null
+    ) {
+      return;
+    }
+
+    if (
+      typeof window !== 'undefined' &&
+      !window.confirm(
+        status === 'accepted'
+          ? `Confirmer l'acceptation du don « ${offer.product} » ?`
+          : `Confirmer le refus du don « ${offer.product} » ?`
+      )
+    ) {
+      return;
+    }
 
     this.respondingOfferId.set(id);
     this.feedback.set('');
+    this.loadError.set('');
+
     this.donationOffersService.respond(id, status).subscribe({
-      next: () => {
-        this.offers.update((offers) => offers.map((item) => item.id === id ? { ...item, status } : item));
+      next: (resultat: unknown) => {
         this.respondingOfferId.set(null);
-        this.feedback.set(status === 'accepted'
-          ? `${offer.product} accepté. L’envoi attend la validation du chef.`
-          : `${offer.product} refusé.`
-        );
+
+        if (status === 'accepted') {
+          const response = resultat as {
+            email_envoye?: boolean;
+          };
+
+          this.feedback.set(
+            response.email_envoye
+              ? `${offer.product} accepté. Le chef a été notifié par email.`
+              : `${offer.product} accepté. L'envoi de l'email doit être vérifié.`
+          );
+        } else {
+          this.feedback.set(`${offer.product} refusé.`);
+        }
+
+        // Recharge la liste afin de récupérer les statuts réels du serveur.
+        this.loadOffers();
       },
       error: (error: { status: number }) => {
         this.respondingOfferId.set(null);
-        this.feedback.set(this.apiErrorMessage(error.status));
-      }
+        this.feedback.set('');
+        this.loadError.set(this.apiErrorMessage(error.status));
+      },
     });
   }
 
@@ -118,52 +221,117 @@ export class Association {
       expirationDate: offer.expiration_date,
       restaurant: offer.restaurant,
       location: offer.location,
-      status: offer.status
+      status: offer.status,
     };
   }
 
   private categoryKey(category: string): string {
-    switch (category) {
-      case 'Produits laitiers': return 'dairy';
-      case 'Légumes': return 'vegetables';
-      case 'Poissons': return 'fish';
-      case 'Fruits': return 'fruit';
-      case 'Viandes': return 'meat';
-      default: return 'other';
+    switch (category.trim().toLocaleUpperCase('fr')) {
+      case 'FRUITS':
+      case 'FRUIT':
+        return 'fruit';
+
+      case 'LEGUMES':
+      case 'LÉGUMES':
+        return 'vegetables';
+
+      case 'POISSONS':
+      case 'POISSON':
+        return 'fish';
+
+      case 'VIANDES':
+      case 'VIANDE':
+        return 'meat';
+
+      case 'LAITIERS':
+      case 'PRODUITS LAITIERS':
+        return 'dairy';
+
+      default:
+        return 'other';
     }
   }
 
   private apiErrorMessage(status: number): string {
-    if (status === 0) return 'Impossible de contacter le serveur Django.';
-    if (status === 401) return 'Votre session a expiré. Reconnectez-vous pour consulter les dons.';
-    if (status === 403) return 'Cette fonctionnalité est réservée aux comptes association.';
-    if (status === 404) return 'Cette proposition n’est plus disponible.';
+    if (status === 0) {
+      return 'Impossible de contacter le serveur Django.';
+    }
+
+    if (status === 400) {
+      return 'Cette proposition n’est plus disponible ou les données sont invalides.';
+    }
+
+    if (status === 401) {
+      return 'Votre session a expiré. Reconnectez-vous pour consulter les dons.';
+    }
+
+    if (status === 403) {
+      return 'Cette fonctionnalité est réservée aux comptes association.';
+    }
+
+    if (status === 404) {
+      return 'Cette proposition n’est plus disponible.';
+    }
+
+    if (status === 409) {
+      return 'Cette proposition a déjà été traitée.';
+    }
+
     return `Erreur serveur (${status}). Veuillez réessayer.`;
   }
 
   daysUntil(date: string): number {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return Math.ceil((new Date(`${date}T00:00:00`).getTime() - today.getTime()) / 86400000);
+
+    const expiration = new Date(`${date}T00:00:00`);
+
+    if (Number.isNaN(expiration.getTime())) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+
+    return Math.ceil(
+      (expiration.getTime() - today.getTime()) / 86400000
+    );
   }
 
   formatDate(date: string): string {
-    return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(`${date}T12:00:00`));
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+    }).format(new Date(`${date}T12:00:00`));
   }
 
   expiryLabel(date: string): string {
     const days = this.daysUntil(date);
-    if (days < 0) return `Expiré depuis ${Math.abs(days)} jour${days === -1 ? '' : 's'}`;
-    if (days === 0) return 'Expire aujourd’hui';
-    if (days === 1) return 'Expire demain';
+
+    if (days === Number.MAX_SAFE_INTEGER) {
+      return 'Date inconnue';
+    }
+
+    if (days < 0) {
+      return `Expiré depuis ${Math.abs(days)} jour${days === -1 ? '' : 's'}`;
+    }
+
+    if (days === 0) {
+      return 'Expire aujourd’hui';
+    }
+
+    if (days === 1) {
+      return 'Expire demain';
+    }
+
     return `Expire dans ${days} jours`;
   }
 
   statusLabel(status: OfferStatus): string {
     switch (status) {
-      case 'accepted': return 'Accepté · validation du chef';
-      case 'refused': return 'Refusé';
-      default: return 'À traiter';
+      case 'accepted':
+        return 'Accepté';
+      case 'refused':
+        return 'Refusé';
+      default:
+        return 'À traiter';
     }
   }
 }

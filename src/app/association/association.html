@@ -1,84 +1,306 @@
+```html
 <div class="association-page">
-	<aside class="sidebar">
-		<a class="brand" href="/association" aria-label="SmartFood, espace association">
-			<span class="brand-mark"><svg lucideLeaf [size]="22"></svg></span>
-			<span class="brand-name">smartfood<span>.</span><small>ESPACE ASSOCIATION</small></span>
-		</a>
-		<div class="association-profile">
-			<div class="profile-avatar">A</div>
-			<div><strong>Association El Amal</strong><span>Partenaire solidaire</span></div>
-			<span class="online-dot" aria-label="Compte actif"></span>
-		</div>
-		<p class="nav-caption">GESTION DES DONS</p>
-		<nav class="navigation" aria-label="Filtrer les propositions">
-			<button [class.active]="activeFilter() === 'pending'" (click)="setFilter('pending')"><svg lucideBell [size]="18"></svg><span>À traiter</span>@if (pendingCount() > 0) { <span class="nav-count">{{ pendingCount() }}</span> }</button>
-			<button [class.active]="activeFilter() === 'accepted'" (click)="setFilter('accepted')"><svg lucideCheck [size]="18"></svg><span>Acceptés</span></button>
-			<button [class.active]="activeFilter() === 'refused'" (click)="setFilter('refused')"><svg lucideX [size]="18"></svg><span>Refusés</span></button>
-			<button [class.active]="activeFilter() === 'all'" (click)="setFilter('all')"><svg lucidePackage [size]="18"></svg><span>Toutes les propositions</span></button>
-		</nav>
-		<div class="sidebar-bottom">
-			<div class="impact-note"><span class="impact-icon"><svg lucideHeartHandshake [size]="19"></svg></span><p>Chaque réponse rapide donne plus de chances aux produits d’être distribués à temps.</p></div>
-			<div class="sidebar-footer"><span class="footer-dot"></span> SmartFood · Hammamet</div>
-		</div>
-	</aside>
+  <aside class="sidebar">
+    <a class="brand" href="/association" aria-label="SmartFood, espace association">
+      <span class="brand-mark">
+        <svg lucideLeaf [size]="22"></svg>
+      </span>
+      <span class="brand-name">
+        smartfood<span>.</span>
+        <small>ESPACE ASSOCIATION</small>
+      </span>
+    </a>
 
-	<main class="main-content">
-		<header class="topbar">
-			<div><p class="breadcrumb">SMARTFOOD <span>/</span> ESPACE ASSOCIATION</p><h1>Propositions de dons</h1></div>
-			<div class="topbar-right"><button class="logout-button" (click)="logout()"><svg lucideLogOut [size]="17"></svg><span>Déconnexion</span></button><button class="notification-button" aria-label="Propositions à traiter"><svg lucideBell [size]="19"></svg>@if (pendingCount() > 0) { <span class="notification-count">{{ pendingCount() }}</span> }</button><div class="user-avatar" aria-label="Association El Amal">A</div></div>
-		</header>
+    <div class="association-profile">
+      <div class="profile-avatar">A</div>
+      <div>
+        <strong>Association El Amal</strong>
+        <span>Partenaire solidaire</span>
+      </div>
+      <span class="online-dot" aria-label="Compte actif"></span>
+    </div>
 
-		<section class="welcome-row">
-			<div>
-				<p class="eyebrow"><span></span> CIRCUIT SOLIDAIRE · HAMMAMET</p>
-				<h2>Des produits à sauver,<br /><em>des repas à partager.</em></h2>
-				<p class="welcome-description">Consultez les produits proposés par les restaurateurs et répondez aux dons disponibles.</p>
-			</div>
-			<div class="welcome-illustration" aria-hidden="true"><span class="illustration-ring"></span><span class="illustration-leaf"><svg lucideLeaf [size]="42"></svg></span><span class="illustration-stem"></span></div>
-		</section>
+    <p class="nav-caption">GESTION DES DONS</p>
 
-		<section class="metrics" aria-label="Résumé des propositions">
-			<article class="metric metric-pending"><span class="metric-label">À traiter</span><strong>{{ pendingCount() }}</strong><span class="metric-foot">propositions en attente</span></article>
-			<article class="metric metric-urgent"><span class="metric-label">À distribuer rapidement</span><strong>{{ urgentCount() }}</strong><span class="metric-foot">expiration sous 48 h</span></article>
-			<article class="metric metric-accepted"><span class="metric-label">Acceptés</span><strong>{{ acceptedCount() }}</strong><span class="metric-foot">en attente du chef</span></article>
-		</section>
+    <nav class="navigation" aria-label="Filtrer les propositions">
+      <button
+        [class.active]="activeFilter() === 'pending'"
+        (click)="setFilter('pending')">
+        <svg lucideBell [size]="18"></svg>
+        <span>À traiter</span>
+        @if (pendingCount() > 0) {
+          <span class="nav-count">{{ pendingCount() }}</span>
+        }
+      </button>
 
-		<section class="offers-section" aria-labelledby="offers-heading">
-			<div class="offers-heading">
-				<div><p class="section-kicker">COLLECTE ALIMENTAIRE</p><h2 id="offers-heading">{{ activeFilter() === 'pending' ? 'À examiner' : activeFilter() === 'accepted' ? 'Dons acceptés' : activeFilter() === 'refused' ? 'Dons refusés' : 'Toutes les propositions' }}</h2></div>
-				<label class="search-box"><svg lucideSearch [size]="17"></svg><input type="search" aria-label="Rechercher un produit ou un restaurant" placeholder="Produit, restaurant…" [value]="searchTerm()" (input)="updateSearch($event)" /></label>
-			</div>
+      <button
+        [class.active]="activeFilter() === 'accepted'"
+        (click)="setFilter('accepted')">
+        <svg lucideCheck [size]="18"></svg>
+        <span>Acceptés</span>
+      </button>
 
-			<div class="offer-list">
-				@if (loadError()) {
-					<div class="empty-state" role="alert"><h3>Impossible de charger les propositions</h3><p>{{ loadError() }}</p><button (click)="loadOffers()">Réessayer</button></div>
-				} @else if (loading()) {
-					<div class="empty-state" role="status"><p>Chargement des propositions…</p></div>
-				} @else {
-				@for (offer of filteredOffers(); track offer.id) {
-					<article class="offer-row">
-						<div class="product-icon" [class]="'product-icon category-' + offer.categoryKey"><svg lucidePackage [size]="23"></svg></div>
-						<div class="product-details">
-							<div class="product-title-line"><h3>{{ offer.product }}</h3><span class="category-label">{{ offer.category }}</span></div>
-							<p class="restaurant-line">Proposé par <strong>{{ offer.restaurant }}</strong><span class="location-separator">·</span>{{ offer.location }}</p>
-							<div class="expiry-line" [class.expiry-soon]="daysUntil(offer.expirationDate) <= 2 && offer.status === 'pending'"><svg lucideBell [size]="14"></svg><span>{{ expiryLabel(offer.expirationDate) }}</span><span class="date-separator">·</span><span>{{ formatDate(offer.expirationDate) }}</span></div>
-						</div>
-						<div class="offer-quantity"><strong>{{ offer.quantity }}</strong><span>{{ offer.unit }}</span></div>
-						<div class="offer-actions">
-							@if (offer.status === 'pending') {
-								<div class="decision-actions"><button class="accept-button" (click)="respondToOffer(offer.id, 'accepted')" [disabled]="respondingOfferId() === offer.id" [attr.aria-label]="'Accepter ' + offer.product"><svg lucideCheck [size]="16"></svg><span>Accepter</span></button><button class="refuse-button" (click)="respondToOffer(offer.id, 'refused')" [disabled]="respondingOfferId() === offer.id" [attr.aria-label]="'Refuser ' + offer.product">Refuser</button></div>
-							} @else {
-								<span class="status-badge" [class.status-accepted]="offer.status === 'accepted'" [class.status-refused]="offer.status === 'refused'">{{ statusLabel(offer.status) }}</span>
-							}
-						</div>
-					</article>
-				} @empty {
-					<div class="empty-state"><span><svg lucidePackage [size]="27"></svg></span><h3>Aucune proposition trouvée</h3><p>Essayez une autre recherche ou consultez une autre catégorie de réponse.</p>@if (searchTerm() || activeFilter() !== 'all') { <button (click)="setFilter('all'); searchTerm.set('')">Voir toutes les propositions <svg lucideArrowRight [size]="15"></svg></button> }</div>
-				}
-				}
-			</div>
-			<p class="workflow-note"><svg lucideHeartHandshake [size]="17"></svg> L’acceptation réserve le don. Le chef doit encore confirmer l’envoi des produits.</p>
-			@if (feedback()) { <p class="feedback" role="status"><svg lucideCheck [size]="17"></svg>{{ feedback() }}</p> }
-		</section>
-	</main>
+      <button
+        [class.active]="activeFilter() === 'refused'"
+        (click)="setFilter('refused')">
+        <svg lucideX [size]="18"></svg>
+        <span>Refusés</span>
+      </button>
+
+      <button
+        [class.active]="activeFilter() === 'all'"
+        (click)="setFilter('all')">
+        <svg lucidePackage [size]="18"></svg>
+        <span>Toutes les propositions</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="impact-note">
+        <span class="impact-icon">
+          <svg lucideHeartHandshake [size]="19"></svg>
+        </span>
+        <p>
+          Chaque réponse rapide donne plus de chances aux produits
+          d’être distribués à temps.
+        </p>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="footer-dot"></span>
+        SmartFood · Hammamet
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div>
+        <p class="breadcrumb">
+          SMARTFOOD <span>/</span> ESPACE ASSOCIATION
+        </p>
+        <h1>Propositions de dons</h1>
+      </div>
+
+      <div class="topbar-right">
+        <button class="logout-button" (click)="logout()">
+          <svg lucideLogOut [size]="17"></svg>
+          <span>Déconnexion</span>
+        </button>
+
+        <button
+          class="notification-button"
+          aria-label="Propositions à traiter"
+          (click)="setFilter('pending')">
+          <svg lucideBell [size]="19"></svg>
+          @if (pendingCount() > 0) {
+            <span class="notification-count">{{ pendingCount() }}</span>
+          }
+        </button>
+
+        <div class="user-avatar" aria-label="Association El Amal">A</div>
+      </div>
+    </header>
+
+    <section class="welcome-row">
+      <div>
+        <p class="eyebrow">
+          <span></span>
+          CIRCUIT SOLIDAIRE · HAMMAMET
+        </p>
+
+        <h2>
+          Des produits à sauver,<br />
+          <em>des repas à partager.</em>
+        </h2>
+
+        <p class="welcome-description">
+          Consultez les produits proposés par les restaurateurs
+          et répondez aux dons disponibles.
+        </p>
+      </div>
+
+      <div class="welcome-illustration" aria-hidden="true">
+        <span class="illustration-ring"></span>
+        <span class="illustration-leaf">
+          <svg lucideLeaf [size]="42"></svg>
+        </span>
+        <span class="illustration-stem"></span>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="Résumé des propositions">
+      <article class="metric metric-pending">
+        <span class="metric-label">À traiter</span>
+        <strong>{{ pendingCount() }}</strong>
+        <span class="metric-foot">propositions en attente</span>
+      </article>
+
+      <article class="metric metric-urgent">
+        <span class="metric-label">À distribuer rapidement</span>
+        <strong>{{ urgentCount() }}</strong>
+        <span class="metric-foot">expiration sous 48 h</span>
+      </article>
+
+      <article class="metric metric-accepted">
+        <span class="metric-label">Acceptés</span>
+        <strong>{{ acceptedCount() }}</strong>
+        <span class="metric-foot">acceptés par l’association</span>
+      </article>
+    </section>
+
+    <section class="offers-section" aria-labelledby="offers-heading">
+      <div class="offers-heading">
+        <div>
+          <p class="section-kicker">COLLECTE ALIMENTAIRE</p>
+          <h2 id="offers-heading">
+            {{
+              activeFilter() === 'pending'
+                ? 'À examiner'
+                : activeFilter() === 'accepted'
+                  ? 'Dons acceptés'
+                  : activeFilter() === 'refused'
+                    ? 'Dons refusés'
+                    : 'Toutes les propositions'
+            }}
+          </h2>
+        </div>
+
+        <label class="search-box">
+          <svg lucideSearch [size]="17"></svg>
+          <input
+            type="search"
+            aria-label="Rechercher un produit ou un restaurant"
+            placeholder="Produit, restaurant…"
+            [value]="searchTerm()"
+            (input)="updateSearch($event)" />
+        </label>
+      </div>
+
+      <div class="offer-list">
+        @if (loadError()) {
+          <div class="empty-state" role="alert">
+            <h3>Impossible de charger les propositions</h3>
+            <p>{{ loadError() }}</p>
+            <button (click)="loadOffers()">Réessayer</button>
+          </div>
+        } @else if (loading()) {
+          <div class="empty-state" role="status">
+            <p>Chargement des propositions…</p>
+          </div>
+        } @else {
+          @for (offer of filteredOffers(); track offer.id) {
+            <article class="offer-row">
+              <div
+                class="product-icon"
+                [class]="'product-icon category-' + offer.categoryKey">
+                <svg lucidePackage [size]="23"></svg>
+              </div>
+
+              <div class="product-details">
+                <div class="product-title-line">
+                  <h3>{{ offer.product }}</h3>
+                  <span class="category-label">{{ offer.category }}</span>
+                </div>
+
+                <p class="restaurant-line">
+                  Proposé par <strong>{{ offer.restaurant }}</strong>
+                  @if (offer.location) {
+                    <span class="location-separator">·</span>
+                    {{ offer.location }}
+                  }
+                </p>
+
+                <div
+                  class="expiry-line"
+                  [class.expiry-soon]="
+                    daysUntil(offer.expirationDate) >= 0 &&
+                    daysUntil(offer.expirationDate) <= 2 &&
+                    offer.status === 'pending'
+                  ">
+                  <svg lucideBell [size]="14"></svg>
+                  <span>{{ expiryLabel(offer.expirationDate) }}</span>
+                  <span class="date-separator">·</span>
+                  <span>{{ formatDate(offer.expirationDate) }}</span>
+                </div>
+              </div>
+
+              <div class="offer-quantity">
+                <strong>{{ offer.quantity }}</strong>
+                <span>{{ offer.unit }}</span>
+              </div>
+
+              <div class="offer-actions">
+                @if (offer.status === 'pending') {
+                  <div class="decision-actions">
+                    <button
+                      class="accept-button"
+                      (click)="respondToOffer(offer.id, 'accepted')"
+                      [disabled]="respondingOfferId() !== null"
+                      [attr.aria-label]="'Accepter ' + offer.product">
+                      @if (respondingOfferId() === offer.id) {
+                        <span>Traitement…</span>
+                      } @else {
+                        <svg lucideCheck [size]="16"></svg>
+                        <span>Accepter</span>
+                      }
+                    </button>
+
+                    <button
+                      class="refuse-button"
+                      (click)="respondToOffer(offer.id, 'refused')"
+                      [disabled]="respondingOfferId() !== null"
+                      [attr.aria-label]="'Refuser ' + offer.product">
+                      Refuser
+                    </button>
+                  </div>
+                } @else {
+                  <span
+                    class="status-badge"
+                    [class.status-accepted]="offer.status === 'accepted'"
+                    [class.status-refused]="offer.status === 'refused'">
+                    {{ statusLabel(offer.status) }}
+                  </span>
+                }
+              </div>
+            </article>
+          } @empty {
+            <div class="empty-state">
+              <span>
+                <svg lucidePackage [size]="27"></svg>
+              </span>
+
+              <h3>Aucune proposition trouvée</h3>
+              <p>
+                Essayez une autre recherche ou consultez une autre
+                catégorie de réponse.
+              </p>
+
+              @if (searchTerm() || activeFilter() !== 'all') {
+                <button
+                  (click)="setFilter('all'); searchTerm.set('')">
+                  Voir toutes les propositions
+                  <svg lucideArrowRight [size]="15"></svg>
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <p class="workflow-note">
+        <svg lucideHeartHandshake [size]="17"></svg>
+        Après acceptation, le chef est informé par email.
+        Les modalités de récupération du don restent à organiser.
+      </p>
+
+      @if (feedback()) {
+        <p class="feedback" role="status">
+          <svg lucideCheck [size]="17"></svg>
+          {{ feedback() }}
+        </p>
+      }
+    </section>
+  </main>
 </div>
+```

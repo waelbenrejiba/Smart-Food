@@ -18,6 +18,8 @@ export interface LoginResponse {
     role: 'ADMIN' | 'CHEF' | 'ASSOCIATION' | 'CONSUMER';
   };
 }
+
+
 export interface LoginResponse {
   access: string;
   refresh: string;
