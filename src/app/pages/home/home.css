@@ -161,8 +161,8 @@
 
 .floating-badge {
   position: absolute;
-  bottom: -20px;
-  left: -30px;
+  top: 20px;
+  right: 20px;
   background: var(--white);
   padding: 1rem 1.5rem;
   border-radius: 12px;
@@ -299,7 +299,7 @@
   }
   .hero .hero-content { max-width: 100%; }
   .cards-3d-wrapper { flex-direction: column; }
-  .floating-badge { left: 10px; bottom: -10px; }
+  .floating-badge { top: 12px; right: 12px; }
   .card-3d:hover .card-content {
     transform: translateY(-10px); /* Moins de rotation sur mobile */
   }

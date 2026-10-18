@@ -66,4 +66,10 @@ getProfile() {
     { headers }
   );
 }
+
+logout(): void {
+  if (typeof localStorage === 'undefined') return;
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+}
 }

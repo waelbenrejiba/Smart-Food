@@ -2,6 +2,10 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.12.
 
+## Django backend
+
+The Django API lives in [`backend/`](./backend/README.md). See its README for Windows setup, API routes, and tests.
+
 ## Development server
 
 To start a local development server, run:
