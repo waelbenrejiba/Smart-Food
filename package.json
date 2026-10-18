@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
+  "name": "smartfood",
+=======
   "name": "smartfood-front",
+>>>>>>> origin/backend
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +11,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+<<<<<<< HEAD
+    "serve:ssr:smartfood": "node dist/smartfood/server/server.mjs"
+=======
     "serve:ssr:smartfood-front": "node dist/smartfood-front/server/server.mjs"
+>>>>>>> origin/backend
   },
   "private": true,
   "packageManager": "npm@11.6.2",
